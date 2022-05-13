@@ -32,6 +32,9 @@ import Table from '@ckeditor/ckeditor5-table/src/table';
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar';
 import TextTransformation from '@ckeditor/ckeditor5-typing/src/texttransformation';
 import CloudServices from '@ckeditor/ckeditor5-cloud-services/src/cloudservices';
+import FontSize from '@ckeditor/ckeditor5-font/src/fontsize.js';
+import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight.js';
+import Underline from '@ckeditor/ckeditor5-basic-styles/src/underline.js';
 
 class ClassicEditor extends ClassicEditorBase {}
 class BalloonEditor extends BalloonEditorBase {}
@@ -66,8 +69,22 @@ const plugins = [
 ];
 
 ClassicEditor.builtinPlugins = plugins;
-BalloonEditor.builtinPlugins = plugins;
 InlineEditor.builtinPlugins = plugins;
+BalloonEditor.builtinPlugins = [
+	Autoformat,
+	BlockQuote,
+	Bold,
+	Essentials,
+	FontSize,
+	Highlight,
+	Indent,
+	Italic,
+	Link,
+	Paragraph,
+	TextTransformation,
+	Underline
+];
+
 
 // Editor configuration.
 const config = {
