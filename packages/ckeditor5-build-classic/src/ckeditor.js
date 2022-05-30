@@ -35,6 +35,8 @@ import CloudServices from '@ckeditor/ckeditor5-cloud-services/src/cloudservices'
 import FontSize from '@ckeditor/ckeditor5-font/src/fontsize.js';
 import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight.js';
 import Underline from '@ckeditor/ckeditor5-basic-styles/src/underline.js';
+import FontFamily from '@ckeditor/ckeditor5-font/src/fontfamily';
+import FontColor from '@ckeditor/ckeditor5-font/src/fontcolor';
 
 class ClassicEditor extends ClassicEditorBase {}
 class BalloonEditor extends BalloonEditorBase {}
@@ -65,7 +67,10 @@ const plugins = [
 	PasteFromOffice,
 	Table,
 	TableToolbar,
-	TextTransformation
+	TextTransformation,
+	FontSize,
+	FontFamily,
+	FontColor
 ];
 
 ClassicEditor.builtinPlugins = plugins;
