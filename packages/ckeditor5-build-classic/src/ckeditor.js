@@ -37,6 +37,8 @@ import Highlight from '@ckeditor/ckeditor5-highlight/src/highlight.js';
 import Underline from '@ckeditor/ckeditor5-basic-styles/src/underline.js';
 import FontFamily from '@ckeditor/ckeditor5-font/src/fontfamily';
 import FontColor from '@ckeditor/ckeditor5-font/src/fontcolor';
+// import SimpleUploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/simpleuploadadapter';
+import Base64UploadAdapter from '@ckeditor/ckeditor5-upload/src/adapters/base64uploadadapter';
 
 class ClassicEditor extends ClassicEditorBase {}
 class BalloonEditor extends BalloonEditorBase {}
@@ -53,6 +55,8 @@ const plugins = [
 	CKFinder,
 	CloudServices,
 	EasyImage,
+	// SimpleUploadAdapter,
+	Base64UploadAdapter,
 	Heading,
 	Image,
 	ImageCaption,
@@ -89,7 +93,6 @@ BalloonEditor.builtinPlugins = [
 	TextTransformation,
 	Underline
 ];
-
 
 // Editor configuration.
 const config = {
