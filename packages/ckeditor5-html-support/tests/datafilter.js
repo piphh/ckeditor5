@@ -605,6 +605,24 @@ describe( 'DataFilter', () => {
 			);
 		} );
 
+		it( 'should not change order of attributes', () => {
+			dataFilter.allowElement( 'section' );
+			dataFilter.allowAttributes( {
+				name: 'section',
+				attributes: true
+			} );
+
+			editor.setData( '<section data-foo="a" data-bar="b"><p>foobar</p></section>' );
+
+			expect( getModelData( model, { withoutSelection: true } ) ).to.deep.equal(
+				'<htmlSection htmlAttributes="{"attributes":{"data-foo":"a","data-bar":"b"}}"><paragraph>foobar</paragraph></htmlSection>'
+			);
+
+			expect( editor.getData() ).to.equal(
+				'<section data-foo="a" data-bar="b"><p>foobar</p></section>'
+			);
+		} );
+
 		it( 'should disallow attributes', () => {
 			dataFilter.allowElement( 'section' );
 			dataFilter.allowAttributes( { name: 'section', attributes: { 'data-foo': /[\s\S]+/ } } );
@@ -722,6 +740,26 @@ describe( 'DataFilter', () => {
 			expect( editor.getData() ).to.equal( '<section><p>foo</p></section>' );
 		} );
 
+		// https://github.com/ckeditor/ckeditor5/issues/11000
+		it( 'should not consume element attributes if the element was consumed into a collapsed range', () => {
+			dataFilter.allowElement( 'input' );
+			dataFilter.allowAttributes( { name: 'input', attributes: true } );
+
+			editor.data.upcastDispatcher.on( 'element:input', ( evt, data, conversionApi ) => {
+				if ( conversionApi.consumable.consume( data.viewItem, { name: true } ) ) {
+					data.modelRange = conversionApi.writer.createRange( data.modelCursor );
+				}
+			} );
+
+			editor.data.upcastDispatcher.on( 'element:input', ( evt, data, conversionApi ) => {
+				const areConsumable = conversionApi.consumable.test( data.viewItem, { attributes: [ 'type', 'disabled' ] } );
+
+				expect( areConsumable ).to.be.true;
+			}, { priority: 'lowest' } );
+
+			editor.setData( '<p>foo<input type="checkbox" disabled="disabled">bar</p>' );
+		} );
+
 		it( 'should not create empty htmlA (upcast)', () => {
 			editor.conversion.for( 'upcast' ).add( dispatcher => {
 				dispatcher.on( 'element:a', ( evt, data, conversionApi ) => {
@@ -826,6 +864,37 @@ describe( 'DataFilter', () => {
 			expect( () => {
 				dataFilter.allowElement( 'bar' );
 			} ).to.not.throw();
+		} );
+
+		it( 'should not allow invalid attributes', () => {
+			dataFilter.allowElement( 'p' );
+			dataFilter.allowAttributes( {
+				name: 'p',
+				attributes: true
+			} );
+
+			editor.setData( '<p zzz="a" ab?cd="2">x</p><p foo="a" bar' );
+
+			expect( getModelDataWithAttributes( model, { withoutSelection: true } ) ).to.deep.equal( {
+				data: '<paragraph htmlAttributes="(1)">x</paragraph><paragraph htmlAttributes="(2)"></paragraph>',
+				attributes: {
+					1: {
+						attributes: {
+							zzz: 'a'
+						}
+					},
+					2: {
+						attributes: {
+							body: '',
+							foo: 'a'
+						}
+					}
+				}
+			} );
+
+			expect( editor.getData() ).to.equal(
+				'<p zzz="a">x</p><p foo="a" body="">&nbsp;</p>'
+			);
 		} );
 	} );
 
@@ -1745,7 +1814,7 @@ describe( 'DataFilter', () => {
 				} );
 
 				expect( editor.getData() ).to.equal(
-					'<p><input data-bar="bar" data-foo="baz"></p>'
+					'<p><input data-foo="baz" data-bar="bar"></p>'
 				);
 			} );
 
@@ -2326,7 +2395,7 @@ describe( 'DataFilter', () => {
 				} );
 
 				expect( editor.getData() ).to.equal(
-					'<section data-bar="baz bar" data-foo="bar baz"><p>foobar</p></section>'
+					'<section data-foo="bar baz" data-bar="baz bar"><p>foobar</p></section>'
 				);
 			} );
 
